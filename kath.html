@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Para Kath 💖</title>
+  <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      height: 100vh;
+      background-color: black;
+      color: white;
+      font-family: 'Arial', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      overflow: hidden;
+      position: relative;
+    }
+    #particle-container {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+    }
+    .container {
+      z-index: 10;
+      padding: 20px;
+      animation: fadeIn 1s ease forwards;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    h1 {
+      font-size: 3rem;
+      margin-bottom: 2rem;
+    }
+    p {
+      font-size: 2.5rem;
+      margin-bottom: 1.5rem;
+    }
+    button {
+      background-color: #ff66b2;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      padding: 12px 24px;
+      font-size: 1.8rem;
+      margin: 10px;
+      cursor: pointer;
+      transition: all 0.3s;
+      z-index: 10;
+      position: relative;
+    }
+    button:hover {
+      background-color: #ff3399;
+      transform: scale(1.05);
+    }
+    .hidden {
+      display: none;
+    }
+    #yes-button.moving {
+      position: absolute;
+      transition: all 0.3s ease;
+    }
+    #reason-container {
+      margin-top: 20px;
+      font-size: 3rem;
+      min-height: 150px;
+      padding: 20px;
+      animation: fadeIn 1s ease forwards;
+    }
+    /* Vibración */
+    @keyframes shake {
+      0% { transform: translate(2px, 1px) rotate(0deg); }
+      10% { transform: translate(-1px, -2px) rotate(-1deg); }
+      20% { transform: translate(-3px, 0px) rotate(1deg); }
+      30% { transform: translate(0px, 2px) rotate(0deg); }
+      40% { transform: translate(1px, -1px) rotate(1deg); }
+      50% { transform: translate(-1px, 2px) rotate(-1deg); }
+      60% { transform: translate(-3px, 1px) rotate(0deg); }
+      70% { transform: translate(2px, 1px) rotate(-1deg); }
+      80% { transform: translate(-1px, -1px) rotate(1deg); }
+      90% { transform: translate(2px, 2px) rotate(0deg); }
+      100% { transform: translate(1px, -2px) rotate(-1deg); }
+    }
+    .shake {
+      animation: shake 0.5s;
+      animation-iteration-count: 1;
+    }
+  </style>
+</head>
+
+<body>
+
+<div id="particle-container"></div>
+
+<div class="container" id="start-screen">
+  <h1>Para la niña que me gusta, Kath 💖</h1>
+  <button id="start-button">Entrar</button>
+</div>
+
+<div class="container hidden" id="question-screen">
+  <p id="question-text">¿Algún día seremos novios?</p>
+  <button id="yes-button">Sí</button>
+  <button id="no-button">No</button>
+</div>
+
+<div class="container hidden" id="reasons-screen">
+  <p id="reason-container"></p>
+  <button id="next-reason-button">Siguiente</button>
+</div>
+
+<div class="container hidden" id="final-screen">
+  <p id="final-text">De acuerdo...</p>
+</div>
+
+<div class="container hidden" id="acceptance-screen">
+  <button id="accept-button">Ya acepta que nunca seremos nada</button>
+</div>
+
+<script>
+  particlesJS("particle-container", {
+    particles: {
+      number: { value: 100 },
+      size: { value: 4 },
+      move: { enable: true, speed: 2 },
+      color: { value: "#ff66b2" }
+    }
+  });
+
+  const startButton = document.getElementById('start-button');
+  const startScreen = document.getElementById('start-screen');
+  const questionScreen = document.getElementById('question-screen');
+  const yesButton = document.getElementById('yes-button');
+  const noButton = document.getElementById('no-button');
+  const reasonContainer = document.getElementById('reason-container');
+  const reasonsScreen = document.getElementById('reasons-screen');
+  const nextReasonButton = document.getElementById('next-reason-button');
+  const questionText = document.getElementById('question-text');
+  const finalScreen = document.getElementById('final-screen');
+  const acceptanceScreen = document.getElementById('acceptance-screen');
+  const acceptButton = document.getElementById('accept-button');
+
+  let stage = "first"; // "first" -> "funny"
+  const funnyQuestions = [
+    "¿Me odias?",
+    "¿Perdí mi tiempo haciendo esto?",
+    "¿Te caigo mal?",
+    "¿Esto fue una pérdida de tiempo?",
+    "¿De verdad quieres romperme el corazón?"
+  ];
+  const reasons = [
+    "Tu sonrisa ilumina todo mi mundo.",
+    "Cuando hablas, hasta el viento se calla.",
+    "Eres mi lugar favorito.",
+    "Me haces querer ser mejor cada día.",
+    "Tu risa es mi sonido favorito.",
+    "Contigo, todo tiene sentido.",
+    "Eres hermosa de todas las maneras posibles.",
+    "Quiero construir sueños a tu lado.",
+    "Eres más mágica que un atardecer.",
+    "Tenerte en mi vida ya es un regalo."
+  ];
+
+  let funnyIndex = 0;
+  let reasonIndex = 0;
+
+  startButton.addEventListener('click', () => {
+    startScreen.classList.add('hidden');
+    questionScreen.classList.remove('hidden');
+  });
+
+  yesButton.addEventListener('click', () => {
+    if (stage === "first") {
+      questionScreen.classList.add('hidden');
+      reasonsScreen.classList.remove('hidden');
+      showReason();
+    } else if (stage === "funny") {
+      vibrateScreen();
+      setTimeout(() => {
+        questionScreen.classList.add('hidden');
+        acceptanceScreen.classList.remove('hidden');
+      }, 500);
+    }
+  });
+
+  noButton.addEventListener('click', () => {
+    if (stage === "first") {
+      stage = "funny";
+      questionText.textContent = funnyQuestions[funnyIndex];
+      funnyIndex++;
+      yesButton.classList.add('moving');
+    } else {
+      if (funnyIndex < funnyQuestions.length) {
+        questionText.textContent = funnyQuestions[funnyIndex];
+        funnyIndex++;
+      } else {
+        questionScreen.classList.add('hidden');
+        reasonsScreen.classList.remove('hidden');
+        showReason();
+      }
+    }
+  });
+
+  function moveYesButton() {
+    const randomX = Math.random() * (window.innerWidth - yesButton.offsetWidth);
+    const randomY = Math.random() * (window.innerHeight - yesButton.offsetHeight);
+    yesButton.style.left = randomX + 'px';
+    yesButton.style.top = randomY + 'px';
+  }
+
+  function showReason() {
+    reasonContainer.textContent = reasons[reasonIndex];
+  }
+
+  nextReasonButton.addEventListener('click', () => {
+    reasonIndex++;
+    if (reasonIndex < reasons.length) {
+      showReason();
+    } else {
+      nextReasonButton.classList.add('hidden');
+      reasonContainer.textContent = "Siempre te voy a querer, Kath 💖";
+    }
+  });
+
+  acceptButton.addEventListener('click', () => {
+    document.getElementById('particle-container').remove();
+    acceptanceScreen.classList.add('hidden');
+    finalScreen.classList.remove('hidden');
+    document.body.style.backgroundColor = "black";
+
+    setTimeout(() => {
+      alert("¡Bromaaa! El que persevera alcanza, Kath 💖");
+    }, 2000); // 2 segundos después
+  });
+
+  // Vibrar la pantalla
+  function vibrateScreen() {
+    document.body.classList.add('shake');
+    setTimeout(() => {
+      document.body.classList.remove('shake');
+    }, 500);
+  }
+
+  setInterval(() => {
+    if (stage === "funny" && yesButton.classList.contains('moving')) {
+      moveYesButton();
+    }
+  }, 800);
+</script>
+
+</body>
+</html>
